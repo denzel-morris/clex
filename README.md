@@ -47,7 +47,7 @@ As of right now, these two punctuators will be lexed as three *Period*'s and two
 The underlying issue is lack of sufficient character lookahead. Right now, it looks ahead 1-character at most. So, there's two options:
 
 1. Extend the underlying reader to support K-character lookahead
-2. Run a post-processing pass that collapses sequences of *Period* and *Hash* lexemes into *Ellipsis and *DoubleHash*
+2. Run a post-processing pass that collapses sequences of *Period* and *Hash* lexemes into *Ellipsis* and *DoubleHash*
 
 My plan is to write up both solutions and compare them side-by-side.
 
