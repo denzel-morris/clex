@@ -1,6 +1,6 @@
 package lex
 
-import "github.com/DenzelMorris/clex/lex/lexemes"
+import "github.com/denzel-morris/clex/lex/lexemes"
 
 var punctuatorToType = map[string]lexemes.Type{
 	"":   lexemes.Invalid,

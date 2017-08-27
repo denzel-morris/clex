@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/DenzelMorris/clex/lex/lexemes"
+	"github.com/denzel-morris/clex/lex/lexemes"
 )
 
 type fullMatchTestCase struct {

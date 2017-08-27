@@ -3,7 +3,7 @@ package lex
 import (
 	"fmt"
 
-	"github.com/DenzelMorris/clex/lex/lexemes"
+	"github.com/denzel-morris/clex/lex/lexemes"
 )
 
 type Lexeme struct {

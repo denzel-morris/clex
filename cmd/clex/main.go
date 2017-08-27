@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/DenzelMorris/clex/lex"
+	"github.com/denzel-morris/clex/lex"
 )
 
 func main() {

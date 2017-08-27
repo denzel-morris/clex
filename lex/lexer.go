@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"sort"
 
-	"github.com/DenzelMorris/clex/lex/lexemes"
+	"github.com/denzel-morris/clex/lex/lexemes"
 )
 
 type Lexer interface {
