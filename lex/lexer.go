@@ -184,29 +184,42 @@ func (l *lexer) lexIntegerSuffix() {
 }
 
 func (l *lexer) lexFloatingSuffix() lexemes.Type {
+	var typ lexemes.Type
+
 	switch r := l.peek(); {
 	case isDecimalPoint(r):
+		typ = lexemes.FloatingConstant
 		l.consume(decimalPoint)
 		l.consumeWhile(decimalDigit)
 		fallthrough
 	case startsExponentPart(r):
-		if l.lexExponentPart() == lexemes.Invalid {
-			return lexemes.Invalid
+		switch exponentTyp := l.lexExponentPart(); exponentTyp {
+		case lexemes.Invalid:
+			return exponentTyp
+		default:
+			typ = lexemes.FloatingConstant
 		}
 	}
 	l.consume(oneOf("fFlL"))
-	return lexemes.FloatingConstant
+	return typ
 }
 
 func (l *lexer) lexExponentPart() lexemes.Type {
 	if _, ok := l.consume(oneOf("eEpP")); !ok {
 		return lexemes.FloatingConstant
 	}
-	l.consume(oneOf("+-"))
+	_, hasSign := l.consume(oneOf("+-"))
 	if l.consumeAtLeastOne(decimalDigit) {
 		return lexemes.FloatingConstant
 	}
-	l.reportError("Exponent must have at least one digit")
+
+	if hasSign {
+		l.reportError("Exponent must have at least one digit")
+	} else if len(l.value()) == 2 {
+		l.buf.Truncate(l.buf.Len() - 1)
+		l.stream.UnreadRune()
+	}
+
 	return lexemes.Invalid
 }
 
@@ -288,9 +301,18 @@ func (l *lexer) lexPunctuator() lexemes.Type {
 		tok += string(l.peek())
 	}
 	typ := punctuatorToType[l.value()]
-	if typ == lexemes.Invalid {
+	if typ == lexemes.Invalid && len(l.value()) <= 1 {
 		l.reportError("Unregonized character `" + l.value() + "`")
+		return typ
 	}
+
+	// Backout until we find a valid punctuator
+	var present bool
+	for typ, present = punctuatorToType[l.value()]; present && typ == lexemes.Invalid; typ, present = punctuatorToType[l.value()] {
+		l.buf.Truncate(l.buf.Len() - 1)
+		l.stream.UnreadRune()
+	}
+
 	return typ
 }
 

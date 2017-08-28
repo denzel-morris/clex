@@ -1,6 +1,6 @@
 # clex
 
-A 95-99% standards-compliant 
+A fully standards-compliant 
 [C11](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf) positional lexer with 
 error reporting.
 
@@ -32,24 +32,6 @@ Keyword{extern}Whitespace{ }Keyword{int}Whitespace{ }Identifier{puts}LeftParenth
 Keyword{const}Whitespace{ }Keyword{char}Whitespace{ }Star{*}Identifier{str}RightParenthesis{)}
 ...
 ```
-
-## Path to Full Compliance
-
-There's a couple minor outstanding issues centered upon the lexing of *punctuators*. I'm weighing the options on how to solve the issue elegantly, if possible.
-
-The problem lexemes are:
-
-* Ellipsis: "..."
-* DoubleHash: "%:%:"
-
-As of right now, these two punctuators will be lexed as three *Period*'s and two *Hash*'s, respectively.
-
-The underlying issue is lack of sufficient character lookahead. Right now, it looks ahead 1-character at most. So, there's two options:
-
-1. Extend the underlying reader to support K-character lookahead
-2. Run a post-processing pass that collapses sequences of *Period* and *Hash* lexemes into *Ellipsis* and *DoubleHash*
-
-My plan is to write up both solutions and compare them side-by-side.
 
 ## Future Plans
 

@@ -19,7 +19,7 @@ func main() {
 	defer output.Close()
 
 	lexer := lex.NewLexer(
-		lex.NewLineReader(lex.NewReader(bufio.NewReader(input))),
+		lex.NewLookaheadLineReader(lex.NewLookaheadReader(bufio.NewReader(input), 4), 4),
 		&LogErrorPolicy{},
 	)
 	lexemelist, err := lexer.Lex()

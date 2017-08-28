@@ -19,7 +19,7 @@ type partialMatchTestCase struct {
 
 func TestLexerNext(t *testing.T) {
 	for _, c := range fullMatchTestCases {
-		lexer := makeLexer(c.input, &EmptyErrorPolicy{})
+		lexer := makeLookaheadLexer(c.input, &EmptyErrorPolicy{})
 		lexeme, err := lexer.Next()
 		if err != nil {
 			t.Error("On case:", c, "got error", err)
@@ -31,7 +31,7 @@ func TestLexerNext(t *testing.T) {
 	}
 
 	for _, c := range partialMatchTestCases {
-		lexer := makeLexer(c.input, &EmptyErrorPolicy{})
+		lexer := makeLookaheadLexer(c.input, &EmptyErrorPolicy{})
 		lexeme, err := lexer.Next()
 		if err != nil {
 			t.Error("On case:", c, "got error", err)
@@ -46,7 +46,7 @@ func TestLexerNext(t *testing.T) {
 func TestLexerLexicalErrors(t *testing.T) {
 	policy := &CountingErrorPolicy{}
 	for _, input := range errorTestCases {
-		lexer := makeLexer(input, policy)
+		lexer := makeLookaheadLexer(input, policy)
 		lexeme, _ := lexer.Next()
 
 		if lexeme.Type != lexemes.Invalid {
@@ -59,9 +59,9 @@ func TestLexerLexicalErrors(t *testing.T) {
 	}
 }
 
-func makeLexer(input string, policy ErrorPolicy) Lexer {
+func makeLookaheadLexer(input string, policy ErrorPolicy) Lexer {
 	return NewLexer(
-		NewLineReader(NewReader(strings.NewReader(input))),
+		NewLookaheadLineReader(NewLookaheadReader(strings.NewReader(input), 4), 4),
 		policy,
 	)
 }
@@ -293,7 +293,7 @@ var fullMatchTestCases = []fullMatchTestCase{
 	{"?", lexemes.QuestionMark},
 	{":", lexemes.Colon},
 	{";", lexemes.SemiColon},
-	//{"...", lexemes.Ellipsis},
+	{"...", lexemes.Ellipsis},
 	{"=", lexemes.Equal},
 	{"+=", lexemes.PlusEqual},
 	{"-=", lexemes.MinusEqual},
@@ -311,7 +311,7 @@ var fullMatchTestCases = []fullMatchTestCase{
 	{"<%", lexemes.LeftCurlyBrace},
 	{"%>", lexemes.RightCurlyBrace},
 	{"%:", lexemes.Hash},
-	//{"%:%:", lexemes.DoubleHash},
+	{"%:%:", lexemes.DoubleHash},
 	{",", lexemes.Comma},
 	{"    \f\n\r\t\v\f\n\r\t\v ", lexemes.Whitespace},
 	{"1.0E", lexemes.Invalid},
@@ -320,8 +320,9 @@ var fullMatchTestCases = []fullMatchTestCase{
 var partialMatchTestCases = []partialMatchTestCase{
 	{"1.0+", Lexeme{lexemes.FloatingConstant, "1.0"}},
 	{"..", Lexeme{lexemes.Period, "."}},
-	{"...", Lexeme{lexemes.Period, "."}},
-	{"%:%:", Lexeme{lexemes.Hash, "%:"}},
+	{"%:%", Lexeme{lexemes.Hash, "%:"}},
+	{".pragma", Lexeme{lexemes.Period, "."}},
+	{".extended", Lexeme{lexemes.Period, "."}},
 }
 
 var errorTestCases = []string{
